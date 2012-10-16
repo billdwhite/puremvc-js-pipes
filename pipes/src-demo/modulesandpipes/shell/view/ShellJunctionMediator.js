@@ -15,7 +15,7 @@ define(
 
 
             constructor: function(name, viewComponent) {
-                this.name = ShellJunctionMediator.NAME;
+                this.mediatorName = ShellJunctionMediator.NAME;
                 this.setViewComponent(new puremvc.pipes.Junction());
                 this.outMap = [];
             },

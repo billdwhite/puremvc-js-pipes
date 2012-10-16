@@ -17,6 +17,7 @@ define(
 
 
             constructor: function(/*String*/name, /*Shell*/viewComponent) {
+                this.mediatorName = name;
                 this.shell = viewComponent;
                 this.moduleList = [];
             },

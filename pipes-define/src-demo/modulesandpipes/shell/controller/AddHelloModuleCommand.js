@@ -21,7 +21,7 @@ define(
                     helloModule = new module();
                     helloModule.startup();
                     // we register a mediator for each newly created module.
-                    var moduleMediator = new ModuleMediator(helloModule.moduleID, helloModule)
+                    var moduleMediator = new ModuleMediator(helloModule.moduleID, helloModule);
                     this.getFacade().registerMediator(moduleMediator);
 
                     /*

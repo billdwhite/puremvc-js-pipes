@@ -31,7 +31,7 @@ define(
              * </P>
              */
             constructor: function(name, viewComponent) {
-                this.name = HelloModuleJunctionMediator.NAME;
+                this.mediatorName = HelloModuleJunctionMediator.NAME;
                 this.setViewComponent(new org.puremvc.js.multicore.utilities.pipes.plumbing.Junction());
             },
 

@@ -20,6 +20,7 @@ define(
 
 
             constructor: function(name, viewComponent) {
+                this.mediatorName = name;
                 this.helloModule = viewComponent;
             },
 

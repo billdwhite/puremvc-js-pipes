@@ -606,7 +606,7 @@ Filter.prototype.applyFilter =function(/*PipeMessage*/message)
  * to communicate with other Cores using the Pipes
  * utility.</P>
  */
-function Junction()
+function Junction(args)
 {
     this.inputPipes = [];
     this.outputPipes = [];
@@ -805,6 +805,7 @@ Junction.OUTPUT = "output";
  */
 function JunctionMediator()
 {
+    console.log("JunctionMediator")
 }
 
 

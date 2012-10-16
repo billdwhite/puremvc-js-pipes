@@ -24,7 +24,7 @@ define(
 
 
             constructor: function(name, viewComponent) {
-                this.name = HelloModuleJunctionMediator.NAME;
+                this.mediatorName = HelloModuleJunctionMediator.NAME;
                 this.setViewComponent(new puremvc.pipes.Junction());
                 this.outMap = [];
             },
@@ -40,13 +40,9 @@ define(
              */
             onRegister: function() {
                 // The STDIN pipe from the shell to all modules
-                this.getJunction().registerPipe(PipeNames.STDIN,
-                    puremvc.pipes.Junction.OUTPUT,
-                    new puremvc.pipes.TeeSplit());
+                this.getJunction().registerPipe(PipeNames.STDIN, puremvc.pipes.Junction.OUTPUT, new puremvc.pipes.TeeSplit());
                 // The HELLO_OUT_TO_HELLO pipe to the shell from all modules
-                this.getJunction().registerPipe(PipeNames.HELLO_OUT_TO_HELLO,
-                    puremvc.pipes.Junction.INPUT,
-                    new puremvc.pipes.TeeMerge());
+                this.getJunction().registerPipe(PipeNames.HELLO_OUT_TO_HELLO, puremvc.pipes.Junction.INPUT, new puremvc.pipes.TeeMerge());
                 this.getJunction().addPipeListener(PipeNames.HELLO_OUT_TO_HELLO, this, this.handlePipeMessage);
             },
 
@@ -85,7 +81,6 @@ define(
                         // Create the pipe
                         var shellToModuleJunction = new puremvc.pipes.Pipe();
 
-
                         // Connect the pipe to our module facade.
                         moduleFacade.acceptInputPipe(PipeNames.STDIN, shellToModuleJunction);
 
@@ -110,6 +105,9 @@ define(
 
                         this.outMap.splice(this.outMap.indexOf[moduleID], 1);
 
+                        break;
+
+                    default:
                         break;
                 }
             },

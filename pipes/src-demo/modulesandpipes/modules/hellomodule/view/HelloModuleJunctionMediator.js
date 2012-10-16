@@ -31,7 +31,7 @@ define(
              * </P>
              */
             constructor: function(name, viewComponent) {
-                this.name = HelloModuleJunctionMediator.NAME;
+                this.mediatorName = HelloModuleJunctionMediator.NAME;
                 this.setViewComponent(new puremvc.pipes.Junction());
             },
 
@@ -119,6 +119,9 @@ define(
                             return;
                         }
 
+                        break;
+
+                    default:
                         break;
                 }
 

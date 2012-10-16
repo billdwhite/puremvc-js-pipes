@@ -23,6 +23,7 @@ define(
              *         An instance of a view
              */
             constructor: function(name, viewComponent) {
+                this.mediatorName = name;
                 this.module = viewComponent;
             },
 

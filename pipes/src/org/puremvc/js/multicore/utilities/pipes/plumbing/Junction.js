@@ -6,7 +6,7 @@
  * to communicate with other Cores using the Pipes
  * utility.</P>
  */
-function Junction()
+function Junction(args)
 {
     this.inputPipes = [];
     this.outputPipes = [];
