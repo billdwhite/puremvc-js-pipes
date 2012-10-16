@@ -1,0 +1,21 @@
+[submodule "dojo"]
+	path = dojo
+	url = https://github.com/dojo/dojo.git
+[submodule "puremvc"]
+	path = puremvc
+	url = https://github.com/PureMVC/puremvc-js-multicore-framework.git
+[submodule "dgrid"]
+	path = dgrid
+	url = https://github.com/SitePen/dgrid.git
+[submodule "dijit"]
+	path = dijit
+	url = https://github.com/dojo/dijit.git
+[submodule "put-selector"]
+	path = put-selector
+	url = https://github.com/kriszyp/put-selector.git
+[submodule "xstyle"]
+	path = xstyle
+	url = https://github.com/kriszyp/xstyle.git
+[submodule "director"]
+	path = director
+	url = https://github.com/flatiron/director.git

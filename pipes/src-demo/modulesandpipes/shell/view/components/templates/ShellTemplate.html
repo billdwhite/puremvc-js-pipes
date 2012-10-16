@@ -1,0 +1,15 @@
+<div style="width:100%;height:100%">
+    <div data-dojo-type="dijit.layout.BorderContainer" style="width:100%;height:100%" data-dojo-props="design:'headline'">
+        <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region:'leading'">
+            <div style="width:350px;height:100%">
+                <button data-dojo-type="dijit.form.Button" data-dojo-attach-point="addHelloModuleButton"
+                        data-dojo-attach-event="onClick: addHelloHandler">Add Hello Module</button>
+                <button data-dojo-type="dijit.form.Button" data-dojo-attach-point="sayHelloAllButton"
+                        data-dojo-attach-event="onClick: helloAllHandler">Say Hello All!</button>
+                <div data-dojo-attach-point="gridContainer" style="width:100%;height:300px;"></div>
+            </div>
+        </div>
+        <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region:'center'" data-dojo-attach-point="containerNode">
+        </div>
+    </div>
+</div>

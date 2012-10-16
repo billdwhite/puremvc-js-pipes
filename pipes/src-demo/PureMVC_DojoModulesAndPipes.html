@@ -1,0 +1,110 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+
+<title>PureMVC Dojo Modules and Pipes - Native</title>
+
+<meta http-equiv="X-UA-Compatible" content="IE=9">
+
+<!-- ROUTER -->
+<script src="../../director/build/director-1.1.6.min.js"></script>
+
+<!-- PUREMVC LIBRARY -->
+<script src="../../puremvc/bin/puremvc-1.0.1.js"></script>
+
+<!-- PIPES LIBRARY -->
+<script src="../bin/puremvc-pipes-1.0.js"></script>
+
+<script type="text/javascript"
+        src="../../dojo/dojo.js"
+        data-dojo-config="async:true,
+                      parseOnLoad:true,
+                      packages: [{
+                          name: 'modulesandpipes',
+                          location: '../pipes/src-demo/modulesandpipes'
+                      },{
+                          name: 'dijit',
+                          location: '../dijit'
+                      },{
+                          name: 'dgrid',
+                          location: '../dgrid'
+                      },{
+                          name: 'put-selector',
+                          location: '../put-selector'
+                      },{
+                          name: 'xstyle',
+                          location: '../xstyle'
+                      }]">
+</script>
+
+<script type="text/javascript">
+    require(
+        [
+            "dojo/ready",
+            "dojo/parser",
+            "dojo/dom",
+            "dojo/on",
+            "dojo/_base/window",
+            "modulesandpipes/shell/view/components/Shell",
+            "modulesandpipes/shell/ShellFacade",
+            "dijit/layout/BorderContainer",
+            "dijit/layout/ContentPane"
+        ],
+        function(ready, parser, dom, on, win, Shell, ShellFacade) {
+            ready(function() {
+                var shell = new Shell({region: 'center'});
+                var facade = ShellFacade.getInstance(Shell.NAME);
+                facade.startup(shell);
+                borderContainer.addChild(shell);
+            });
+        }
+    );
+
+</script>
+
+<link rel="stylesheet" href="../../dijit/themes/tundra/tundra.css"/>
+
+<style>
+html, body {
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    background-color: #EEEEEE; /*232F2E*/
+    font-family: Arial;
+    font-size: 13px;
+}
+
+.borderContainer {
+    width: 100%;
+    height: 100%;
+}
+
+.shellContainer {
+    width: 100%;
+    height: 100%;
+}
+
+.helloModule {
+    width: 250px;
+    padding: 5px;
+    margin: 5px;
+    display: inline-block;
+    border-style: solid;
+    border-color: #000000;
+    border-width: 1px;
+    -webkit-box-shadow: 0 4px 8px 0 #999999;
+    -moz-box-shadow: 0 4px 8px 0 #999999;
+    box-shadow: 0 4px 8px 0 #999999;
+}
+</style>
+
+</head>
+
+<body class="tundra">
+
+<div data-dojo-type="dijit.layout.BorderContainer" class="borderContainer" data-dojo-id="borderContainer">
+</div>
+
+</body>
+
+</html>
