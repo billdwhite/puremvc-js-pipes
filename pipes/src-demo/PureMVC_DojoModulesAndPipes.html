@@ -31,14 +31,14 @@
             "dojo/ready",
             "dojo/dom",
             "dojo/on",
-            "dojox/io",
+            "dojox/io/xhrPlugins",
             "dojo/_base/window",
             "modulesandpipes/shell/view/components/Shell",
             "modulesandpipes/shell/ShellFacade",
             "dijit/layout/BorderContainer",
             "dijit/layout/ContentPane"
         ],
-        function(ready, dom, on, io, win, Shell, ShellFacade) {
+        function(ready, dom, on, xhrPlugins, win, Shell, ShellFacade) {
             dojox.io.xhrPlugins.addCrossSiteXhr("http://htmlpreview.github.com");
             dojox.io.xhrPlugins.addCrossSiteXhr("https://raw.github.com");
             dojox.io.xhrPlugins.addCrossSiteXhr("https://github.com");
