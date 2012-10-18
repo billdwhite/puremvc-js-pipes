@@ -7,13 +7,14 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9">
 
 <!-- ROUTER -->
-<script src="../../director/build/director-1.1.6.min.js"></script>
+<script src="../../libs/director-1.1.6.min.js"></script>
 
 <!-- PUREMVC LIBRARY -->
-<script src="../../puremvc/bin/puremvc-1.0.1.min.js"></script>
+<script src="../../libs/puremvc-1.0.1.min.js"></script>
 
 <!-- PIPES LIBRARY -->
-<script src="../bin/puremvc-pipes-1.0.js"></script>
+<script src="../bin/puremvc-pipes-1.0.min.js"></script>
+
 <!--
 <script src="../src/org/puremvc/js/multicore/utilities/pipes/messages/PipeMessage.js"></script>
 <script src="../src/org/puremvc/js/multicore/utilities/pipes/messages/Message.js"></script>
@@ -32,24 +33,12 @@
 -->
 
 <script type="text/javascript"
-        src="../../dojo/dojo.js"
+        src="../../libs/dojobuild/dojo/dojo.js"
         data-dojo-config="async:true,
                           parseOnLoad:true,
                           packages: [{
                               name: 'modulesandpipes',
-                              location: '../pipes-define/src-demo/modulesandpipes'
-                          },{
-                              name: 'dijit',
-                              location: '../dijit'
-                          },{
-                              name: 'dgrid',
-                              location: '../dgrid'
-                          },{
-                              name: 'put-selector',
-                              location: '../put-selector'
-                          },{
-                              name: 'xstyle',
-                              location: '../xstyle'
+                              location: '../../../pipes-define/src-demo/modulesandpipes/'
                           }]">
 </script>
 
@@ -78,7 +67,7 @@
 
 </script>
 
-<link rel="stylesheet" href="../../dijit/themes/tundra/tundra.css"/>
+<link rel="stylesheet" href="../../libs/dbootstrap.css"/>
 
 <style>
 html, body {
@@ -116,7 +105,7 @@ html, body {
 
 </head>
 
-<body class="tundra">
+<body class="bootstrap">
 
 <div data-dojo-type="dijit.layout.BorderContainer" class="borderContainer" data-dojo-id="borderContainer">
 </div>

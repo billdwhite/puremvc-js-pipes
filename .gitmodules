@@ -19,3 +19,6 @@
 [submodule "director"]
 	path = director
 	url = https://github.com/flatiron/director.git
+[submodule "util"]
+	path = util
+	url = https://github.com/dojo/util.git
