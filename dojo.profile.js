@@ -14,6 +14,7 @@ var profile = {
     packages: [
         "dojo", 
         "dijit",
+        "dojox",
         "xstyle", 
         "put-selector",
         "dgrid"
@@ -23,6 +24,7 @@ var profile = {
             include: [
                 "dojo/dojo",
                 "dijit/dijit",
+                "dojox/io/xhrPlugins",
                 "dojo/domReady", 
                 "dojo/_base/declare",
                 "dgrid/List", 

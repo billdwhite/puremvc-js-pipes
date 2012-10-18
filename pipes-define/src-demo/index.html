@@ -15,23 +15,6 @@
 <!-- PIPES LIBRARY -->
 <script src="../bin/puremvc-pipes-1.0.min.js"></script>
 
-<!--
-<script src="../src/org/puremvc/js/multicore/utilities/pipes/messages/PipeMessage.js"></script>
-<script src="../src/org/puremvc/js/multicore/utilities/pipes/messages/Message.js"></script>
-<script src="../src/org/puremvc/js/multicore/utilities/pipes/messages/FilterControlMessage.js"></script>
-<script src="../src/org/puremvc/js/multicore/utilities/pipes/messages/QueueControlMessage.js"></script>
-<script src="../src/org/puremvc/js/multicore/utilities/pipes/plumbing/PipeFitting.js"></script>
-<script src="../src/org/puremvc/js/multicore/utilities/pipes/plumbing/PipeListener.js"></script>
-<script src="../src/org/puremvc/js/multicore/utilities/pipes/plumbing/Pipe.js"></script>
-<script src="../src/org/puremvc/js/multicore/utilities/pipes/plumbing/Filter.js"></script>
-<script src="../src/org/puremvc/js/multicore/utilities/pipes/plumbing/Junction.js"></script>
-<script src="../src/org/puremvc/js/multicore/utilities/pipes/plumbing/JunctionMediator.js"></script>
-<script src="../src/org/puremvc/js/multicore/utilities/pipes/plumbing/PipeAware.js"></script>
-<script src="../src/org/puremvc/js/multicore/utilities/pipes/plumbing/Queue.js"></script>
-<script src="../src/org/puremvc/js/multicore/utilities/pipes/plumbing/TeeMerge.js"></script>
-<script src="../src/org/puremvc/js/multicore/utilities/pipes/plumbing/TeeSplit.js"></script>
--->
-
 <script type="text/javascript"
         src="../../libs/dojobuild/dojo/dojo.js"
         data-dojo-config="async:false,
@@ -52,8 +35,8 @@
     require(
         [
             "dojo/ready",
-            "dojo/parser",
             "dojo/dom",
+            "dojo/parser",
             "dojo/on",
             "dojo/_base/window",
             "modulesandpipes/shell/view/components/Shell",
@@ -61,7 +44,7 @@
             "dijit/layout/BorderContainer",
             "dijit/layout/ContentPane"
         ],
-        function(ready, parser, dom, on, win, Shell, ShellFacade) {
+        function(ready, dom, parser, on, win, Shell, ShellFacade) {
             ready(function() {
                 var shell = new Shell({region: 'center'});
                 var facade = ShellFacade.getInstance(Shell.NAME);

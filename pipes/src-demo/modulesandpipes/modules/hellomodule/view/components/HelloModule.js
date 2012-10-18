@@ -17,16 +17,14 @@ define(
         "dgrid/Selection",
         "dojo/store/Memory",
         "dojo/store/Observable",
-        "dijit/layout/ContentPane",
-        "dijit/form/Textarea",
-        "dijit/form/Button"
+        "dojo/text!./templates/HelloModuleTemplate.html"
     ],
     function(declare, cache, text, domStyle, domConstruct, on, Widget, TemplatedMixin, WidgetsInTemplateMixin,
-             HelloModuleFacade, HelloModuleConstants, ColorNames, List, Grid, Selection, Memory, Observable) {
+             HelloModuleFacade, HelloModuleConstants, ColorNames, List, Grid, Selection, Memory, Observable, template) {
 
         var HelloModule = declare([Widget, TemplatedMixin, WidgetsInTemplateMixin], {
 
-            templateString: cache("modulesandpipes.modules.hellomodule.view.components", "templates/HelloModuleTemplate.html"),
+            templateString: template,
             facade: null,
             moduleID: null,
             moduleColor: null,

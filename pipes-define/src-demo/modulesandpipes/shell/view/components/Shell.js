@@ -13,14 +13,14 @@ define(
         "dgrid/Selection",
         "dojo/store/Memory",
         "dojo/store/Observable",
-        "dijit/layout/ContentPane",
-        "dijit/form/Button"
+        "dojo/text!./templates/ShellTemplate.html"
     ],
-    function(declare, domConstruct, on, cache, text, Widget, TemplatedMixin, WidgetsInTemplateMixin, List, Grid, Selection, Memory, Observable) {
+    function(declare, domConstruct, on, cache, text, Widget, TemplatedMixin, WidgetsInTemplateMixin, List, Grid, Selection,
+             Memory, Observable, template) {
 
         var Shell = declare([Widget, TemplatedMixin, WidgetsInTemplateMixin], {
 
-            templateString: cache("modulesandpipes.shell.view.components", "templates/ShellTemplate.html"),
+            templateString: template,
             grid: null,
             gridStore: null,
 
