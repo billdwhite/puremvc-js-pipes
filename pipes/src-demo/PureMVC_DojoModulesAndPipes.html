@@ -14,6 +14,7 @@
 
 <!-- PIPES LIBRARY -->  
 <script src="../bin/puremvc-pipes-1.0.min.js"></script>
+<script src="../../libs/dojolayer.js"></script>
 
 <script type="text/javascript"
         src="../../libs/dojobuild/dojo/dojo.js"
@@ -31,13 +32,16 @@
             "dojo/ready",
             "dojo/dom",
             "dojo/on",
+            "dojox/io",
             "dojo/_base/window",
             "modulesandpipes/shell/view/components/Shell",
             "modulesandpipes/shell/ShellFacade",
             "dijit/layout/BorderContainer",
             "dijit/layout/ContentPane"
         ],
-        function(ready, dom, on, win, Shell, ShellFacade) {
+        function(ready, dom, on, io, win, Shell, ShellFacade) {
+            dojox.io.xhrPlugins.addCrossSiteXhr("http://htmlpreview.github.com");
+            dojox.io.xhrPlugins.addCrossSiteXhr("https://github.com");
             ready(function() {
                 var shell = new Shell({region: 'center'});
                 var facade = ShellFacade.getInstance(Shell.NAME);
@@ -49,7 +53,6 @@
 
 </script>
 
-<link rel="stylesheet" href="../../libs/dojobuild/dijit/themes/dijit.css"/>
 <link rel="stylesheet" href="../../libs/dbootstrap.css"/>
 
 <style>

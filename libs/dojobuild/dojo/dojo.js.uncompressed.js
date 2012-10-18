@@ -1921,6 +1921,10 @@
 		},
 		packages:[
 				{
+					 location:"../dojox",
+					 name:"dojox"
+				},
+				{
 					 location:"../dgrid",
 					 main:"OnDemandGrid",
 					 name:"dgrid"

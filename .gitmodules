@@ -22,3 +22,6 @@
 [submodule "util"]
 	path = util
 	url = https://github.com/dojo/util.git
+[submodule "dojox"]
+	path = dojox
+	url = https://github.com/dojo/dojox.git

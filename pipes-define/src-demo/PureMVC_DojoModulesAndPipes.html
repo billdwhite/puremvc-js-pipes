@@ -14,6 +14,7 @@
 
 <!-- PIPES LIBRARY -->
 <script src="../bin/puremvc-pipes-1.0.min.js"></script>
+<script src="../../libs/dojolayer.js"></script>
 
 <!--
 <script src="../src/org/puremvc/js/multicore/utilities/pipes/messages/PipeMessage.js"></script>
@@ -55,13 +56,15 @@
             "dojo/parser",
             "dojo/dom",
             "dojo/on",
+            "dojox/io",
             "dojo/_base/window",
             "modulesandpipes/shell/view/components/Shell",
             "modulesandpipes/shell/ShellFacade",
             "dijit/layout/BorderContainer",
             "dijit/layout/ContentPane"
         ],
-        function(ready, parser, dom, on, win, Shell, ShellFacade) {
+        function(ready, parser, dom, io, on, win, Shell, ShellFacade) {
+            dojox.io.xhrPlugins.addCrossSiteXhr("http://htmlpreview.github.com");
             ready(function() {
                 var shell = new Shell({region: 'center'});
                 var facade = ShellFacade.getInstance(Shell.NAME);
