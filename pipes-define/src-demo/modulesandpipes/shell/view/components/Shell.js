@@ -13,7 +13,10 @@ define(
         "dgrid/Selection",
         "dojo/store/Memory",
         "dojo/store/Observable",
-        "dojo/text!./templates/ShellTemplate.html"
+        "dojo/text!./templates/ShellTemplate.html",
+        "dijit/layout/ContentPane",
+        "dijit/form/Button"
+
     ],
     function(declare, domConstruct, on, cache, text, Widget, TemplatedMixin, WidgetsInTemplateMixin, List, Grid, Selection,
              Memory, Observable, template) {
