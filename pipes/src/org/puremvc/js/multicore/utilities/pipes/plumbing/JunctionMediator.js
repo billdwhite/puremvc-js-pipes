@@ -3,7 +3,6 @@
  */
 function JunctionMediator()
 {
-    console.log("JunctionMediator")
 }
 
 

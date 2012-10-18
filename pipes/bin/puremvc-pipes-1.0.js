@@ -805,7 +805,6 @@ Junction.OUTPUT = "output";
  */
 function JunctionMediator()
 {
-    console.log("JunctionMediator")
 }
 
 
