@@ -13,14 +13,14 @@ define(
         "dgrid/Selection",
         "dojo/store/Memory",
         "dojo/store/Observable",
-        "dojo/text!./templates/ShellTemplate.html"
+        "dijit/layout/ContentPane",
+        "dijit/form/Button"
     ],
-    function(declare, domConstruct, on, cache, text, Widget, TemplatedMixin, WidgetsInTemplateMixin, List, Grid, Selection,
-             Memory, Observable, template) {
+    function(declare, domConstruct, on, cache, text, Widget, TemplatedMixin, WidgetsInTemplateMixin, List, Grid, Selection, Memory, Observable) {
 
         var Shell = declare([Widget, TemplatedMixin, WidgetsInTemplateMixin], {
 
-            templateString: template,
+            templateString: cache("modulesandpipes.shell.view.components", "templates/ShellTemplate.html"),
             grid: null,
             gridStore: null,
 
@@ -28,7 +28,7 @@ define(
             startup: function() {
                 this.inherited(arguments);
                 this.gridStore = new Observable(new Memory({data:[]}));
-                this.grid = new (declare([Grid, Selection]))({
+                this.grid = new (declare([Grid,Selection]))({
                     store:this.gridStore,
                     columns: [
                         {label: 'Type', field: 'type'},

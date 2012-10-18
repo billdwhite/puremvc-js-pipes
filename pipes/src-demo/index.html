@@ -30,7 +30,6 @@
         [
             "dojo/ready",
             "dojo/dom",
-            "dojo/parser",
             "dojo/on",
             "dojo/_base/window",
             "modulesandpipes/shell/view/components/Shell",
@@ -38,7 +37,7 @@
             "dijit/layout/BorderContainer",
             "dijit/layout/ContentPane"
         ],
-        function(ready, dom, parser, on, win, Shell, ShellFacade) {
+        function(ready, dom, on, win, Shell, ShellFacade) {
             ready(function() {
                 var shell = new Shell({region: 'center'});
                 var facade = ShellFacade.getInstance(Shell.NAME);
