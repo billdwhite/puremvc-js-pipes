@@ -31,9 +31,9 @@ define(
                 this.grid = new (declare([Grid,Selection]))({
                     store:this.gridStore,
                     columns: [
-                        {label: 'type', field: 'type'},
-                        {label: 'body', field: 'body'},
-                        {label: 'message', field: 'message'}
+                        {label: 'Type', field: 'type'},
+                        {label: 'Body', field: 'body'},
+                        {label: 'Message', field: 'message'}
                     ]
                 }, this.gridContainer);
                 this.grid.refresh();
