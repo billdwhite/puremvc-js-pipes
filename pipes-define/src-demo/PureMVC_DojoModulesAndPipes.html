@@ -52,7 +52,6 @@
     require(
         [
             "dojo/ready",
-            "dojo/parser",
             "dojo/dom",
             "dojo/on",
             "dojox/io/xhrPlugins",
@@ -62,7 +61,7 @@
             "dijit/layout/BorderContainer",
             "dijit/layout/ContentPane"
         ],
-        function(ready, parser, dom, xhrPlugins, on, win, Shell, ShellFacade) {
+        function(ready, dom, xhrPlugins, on, win, Shell, ShellFacade) {
             dojox.io.xhrPlugins.addCrossSiteXhr("http://htmlpreview.github.com");
             dojox.io.xhrPlugins.addCrossSiteXhr("https://raw.github.com");
             dojox.io.xhrPlugins.addCrossSiteXhr("https://github.com");
