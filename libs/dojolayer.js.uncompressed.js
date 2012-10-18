@@ -956,6 +956,214 @@ define([
 });
 
 },
+'put-selector/put':function(){
+(function(define){
+var forDocument, fragmentFasterHeuristic = /[-+,> ]/; // if it has any of these combinators, it is probably going to be faster with a document fragment 
+define([], forDocument = function(doc, newFragmentFasterHeuristic){
+"use strict";
+	// module:
+	//		put-selector/put
+	// summary:
+	//		This module defines a fast lightweight function for updating and creating new elements
+	//		terse, CSS selector-based syntax. The single function from this module creates
+	// 		new DOM elements and updates existing elements. See README.md for more information.
+	//	examples:
+	//		To create a simple div with a class name of "foo":
+	//		|	put("div.foo");
+	fragmentFasterHeuristic = newFragmentFasterHeuristic || fragmentFasterHeuristic;
+	try{
+		var selectorParse = /(?:\s*([-+ ,<>]))?\s*(\.|!\.?|#)?([-\w%$]+)?(?:\[([^\]=]+)=?['"]?([^\]'"]*)['"]?\])?/g,
+			undefined, 
+			doc = doc || document,
+			ieCreateElement = 1;
+		put('i', {name:'a'});
+	}catch(e){
+		ieCreateElement = 0;
+	}
+	function insertTextNode(element, text){
+		element.appendChild(doc.createTextNode(text));
+	}
+	function put(topReferenceElement){
+		var fragment, lastSelectorArg, nextSibling, referenceElement, current,
+			args = arguments,
+			returnValue = args[0]; // use the first argument as the default return value in case only an element is passed in
+		function insertLastElement(){
+			// we perform insertBefore actions after the element is fully created to work properly with 
+			// <input> tags in older versions of IE that require type attributes
+			//	to be set before it is attached to a parent.
+			// We also handle top level as a document fragment actions in a complex creation 
+			// are done on a detached DOM which is much faster
+			// Also if there is a parse error, we generally error out before doing any DOM operations (more atomic) 
+			if(current && referenceElement && current != referenceElement){
+				(referenceElement == topReferenceElement &&
+					// top level, may use fragment for faster access 
+					(fragment || 
+						// fragment doesn't exist yet, check to see if we really want to create it 
+						(fragment = fragmentFasterHeuristic.test(argument) && doc.createDocumentFragment()))
+							// any of the above fails just use the referenceElement  
+							|| referenceElement).
+								insertBefore(current, nextSibling || null); // do the actual insertion
+			}
+		}
+		for(var i = 0; i < args.length; i++){
+			var argument = args[i];
+			if(typeof argument == "object"){
+				lastSelectorArg = false;
+				if(argument instanceof Array){
+					// an array
+					current = doc.createDocumentFragment();
+					for(var key = 0; key < argument.length; key++){
+						current.appendChild(put(argument[key]));
+					}
+					argument = current;
+				}
+				if(argument.nodeType){
+					current = argument;
+					insertLastElement();
+					referenceElement = argument;
+					nextSibling = 0;
+				}else{
+					// an object hash
+					for(var key in argument){
+						current[key] = argument[key];
+					}				
+				}
+			}else if(lastSelectorArg){
+				// a text node should be created
+				// take a scalar value, use createTextNode so it is properly escaped
+				// createTextNode is generally several times faster than doing an escaped innerHTML insertion: http://jsperf.com/createtextnode-vs-innerhtml/2
+				lastSelectorArg = false;
+				insertTextNode(current, argument);
+			}else{
+				if(i < 1){
+					// if we are starting with a selector, there is no top element
+					topReferenceElement = null;
+				}
+				lastSelectorArg = true;
+				var leftoverCharacters = argument.replace(selectorParse, function(t, combinator, prefix, value, attrName, attrValue){
+					if(combinator){
+						// insert the last current object
+						insertLastElement();
+						if(combinator == '-' || combinator == '+'){
+							// + or - combinator, 
+							// TODO: add support for >- as a means of indicating before the first child?
+							referenceElement = (nextSibling = (current || referenceElement)).parentNode;
+							current = null;
+							if(combinator == "+"){
+								nextSibling = nextSibling.nextSibling;
+							}// else a - operator, again not in CSS, but obvious in it's meaning (create next element before the current/referenceElement)
+						}else{
+							if(combinator == "<"){
+								// parent combinator (not really in CSS, but theorized, and obvious in it's meaning)
+								referenceElement = current = (current || referenceElement).parentNode;
+							}else{
+								if(combinator == ","){
+									// comma combinator, start a new selector
+									referenceElement = topReferenceElement;
+								}else if(current){
+									// else descendent or child selector (doesn't matter, treated the same),
+									referenceElement = current;
+								}
+								current = null;
+							}
+							nextSibling = 0;
+						}
+						if(current){
+							referenceElement = current;
+						}
+					}
+					var tag = !prefix && value;
+					if(tag || (!current && (prefix || attrName))){
+						if(tag == "$"){
+							// this is a variable to be replaced with a text node
+							insertTextNode(referenceElement, args[++i]);
+						}else{
+							// Need to create an element
+							tag = tag || put.defaultTag;
+							var ieInputName = ieCreateElement && args[i +1] && args[i +1].name;
+							if(ieInputName){
+								// in IE, we have to use the crazy non-standard createElement to create input's that have a name 
+								tag = '<' + tag + ' name="' + ieInputName + '">';
+							}
+							current = doc.createElement(tag);
+						}
+					}
+					if(prefix){
+						if(value == "$"){
+							value = args[++i];
+						}
+						if(prefix == "#"){
+							// #id was specified
+							current.id = value;
+						}else{
+							// we are in the className addition and removal branch
+							var currentClassName = current.className;
+							// remove the className (needed for addition or removal)
+							// see http://jsperf.com/remove-class-name-algorithm/2 for some tests on this
+							var removed = currentClassName && (" " + currentClassName + " ").replace(" " + value + " ", " ");
+							if(prefix == "."){
+								// addition, add the className
+								current.className = currentClassName ? (removed + value).substring(1) : value;
+							}else{
+								// else a '!' class removal
+								if(argument == "!"){
+									// special signal to delete this element
+									// use the ol' innerHTML trick to get IE to do some cleanup
+									put("div", current, '<').innerHTML = "";
+								}else{
+									// we already have removed the class, just need to trim
+									removed = removed.substring(1, removed.length - 1);
+									// only assign if it changed, this can save a lot of time
+									if(removed != currentClassName){
+										current.className = removed;
+									}
+								}
+							}
+							// CSS class removal
+						}
+					}
+					if(attrName){
+						if(attrValue == "$"){
+							attrValue = args[++i];
+						}
+						// [name=value]
+						if(attrName == "style"){
+							// handle the special case of setAttribute not working in old IE
+							current.style.cssText = attrValue;
+						}else{
+							current[attrName.charAt(0) == "!" ? (attrName = attrName.substring(1)) && 'removeAttribute' : 'setAttribute'](attrName, attrValue === '' ? attrName : attrValue);
+						}
+					}
+					return '';
+				});
+				if(leftoverCharacters){
+					throw new SyntaxError("Unexpected char " + leftoverCharacters + " in " + argument);
+				}
+				insertLastElement();
+				referenceElement = returnValue = current || referenceElement;
+			}
+		}
+		if(topReferenceElement && fragment){
+			// we now insert the top level elements for the fragment if it exists
+			topReferenceElement.appendChild(fragment);
+		}
+		return returnValue;
+	}
+	put.defaultTag = "div";
+	put.forDocument = forDocument;
+	return put;
+});
+})(typeof define == "undefined" ? function(deps, factory){
+	if(typeof window == "undefined"){
+		// server side JavaScript, probably (hopefully) NodeJS
+		require("./node-html")(module, factory);
+	}else{
+		// plain script in a browser
+		put = factory();
+	}
+} : define);
+
+},
 'dijit/WidgetSet':function(){
 define([
 	"dojo/_base/array", // array.forEach array.map
@@ -1204,214 +1412,6 @@ define([
 
 	return WidgetSet;
 });
-
-},
-'put-selector/put':function(){
-(function(define){
-var forDocument, fragmentFasterHeuristic = /[-+,> ]/; // if it has any of these combinators, it is probably going to be faster with a document fragment 
-define([], forDocument = function(doc, newFragmentFasterHeuristic){
-"use strict";
-	// module:
-	//		put-selector/put
-	// summary:
-	//		This module defines a fast lightweight function for updating and creating new elements
-	//		terse, CSS selector-based syntax. The single function from this module creates
-	// 		new DOM elements and updates existing elements. See README.md for more information.
-	//	examples:
-	//		To create a simple div with a class name of "foo":
-	//		|	put("div.foo");
-	fragmentFasterHeuristic = newFragmentFasterHeuristic || fragmentFasterHeuristic;
-	try{
-		var selectorParse = /(?:\s*([-+ ,<>]))?\s*(\.|!\.?|#)?([-\w%$]+)?(?:\[([^\]=]+)=?['"]?([^\]'"]*)['"]?\])?/g,
-			undefined, 
-			doc = doc || document,
-			ieCreateElement = 1;
-		put('i', {name:'a'});
-	}catch(e){
-		ieCreateElement = 0;
-	}
-	function insertTextNode(element, text){
-		element.appendChild(doc.createTextNode(text));
-	}
-	function put(topReferenceElement){
-		var fragment, lastSelectorArg, nextSibling, referenceElement, current,
-			args = arguments,
-			returnValue = args[0]; // use the first argument as the default return value in case only an element is passed in
-		function insertLastElement(){
-			// we perform insertBefore actions after the element is fully created to work properly with 
-			// <input> tags in older versions of IE that require type attributes
-			//	to be set before it is attached to a parent.
-			// We also handle top level as a document fragment actions in a complex creation 
-			// are done on a detached DOM which is much faster
-			// Also if there is a parse error, we generally error out before doing any DOM operations (more atomic) 
-			if(current && referenceElement && current != referenceElement){
-				(referenceElement == topReferenceElement &&
-					// top level, may use fragment for faster access 
-					(fragment || 
-						// fragment doesn't exist yet, check to see if we really want to create it 
-						(fragment = fragmentFasterHeuristic.test(argument) && doc.createDocumentFragment()))
-							// any of the above fails just use the referenceElement  
-							|| referenceElement).
-								insertBefore(current, nextSibling || null); // do the actual insertion
-			}
-		}
-		for(var i = 0; i < args.length; i++){
-			var argument = args[i];
-			if(typeof argument == "object"){
-				lastSelectorArg = false;
-				if(argument instanceof Array){
-					// an array
-					current = doc.createDocumentFragment();
-					for(var key = 0; key < argument.length; key++){
-						current.appendChild(put(argument[key]));
-					}
-					argument = current;
-				}
-				if(argument.nodeType){
-					current = argument;
-					insertLastElement();
-					referenceElement = argument;
-					nextSibling = 0;
-				}else{
-					// an object hash
-					for(var key in argument){
-						current[key] = argument[key];
-					}				
-				}
-			}else if(lastSelectorArg){
-				// a text node should be created
-				// take a scalar value, use createTextNode so it is properly escaped
-				// createTextNode is generally several times faster than doing an escaped innerHTML insertion: http://jsperf.com/createtextnode-vs-innerhtml/2
-				lastSelectorArg = false;
-				insertTextNode(current, argument);
-			}else{
-				if(i < 1){
-					// if we are starting with a selector, there is no top element
-					topReferenceElement = null;
-				}
-				lastSelectorArg = true;
-				var leftoverCharacters = argument.replace(selectorParse, function(t, combinator, prefix, value, attrName, attrValue){
-					if(combinator){
-						// insert the last current object
-						insertLastElement();
-						if(combinator == '-' || combinator == '+'){
-							// + or - combinator, 
-							// TODO: add support for >- as a means of indicating before the first child?
-							referenceElement = (nextSibling = (current || referenceElement)).parentNode;
-							current = null;
-							if(combinator == "+"){
-								nextSibling = nextSibling.nextSibling;
-							}// else a - operator, again not in CSS, but obvious in it's meaning (create next element before the current/referenceElement)
-						}else{
-							if(combinator == "<"){
-								// parent combinator (not really in CSS, but theorized, and obvious in it's meaning)
-								referenceElement = current = (current || referenceElement).parentNode;
-							}else{
-								if(combinator == ","){
-									// comma combinator, start a new selector
-									referenceElement = topReferenceElement;
-								}else if(current){
-									// else descendent or child selector (doesn't matter, treated the same),
-									referenceElement = current;
-								}
-								current = null;
-							}
-							nextSibling = 0;
-						}
-						if(current){
-							referenceElement = current;
-						}
-					}
-					var tag = !prefix && value;
-					if(tag || (!current && (prefix || attrName))){
-						if(tag == "$"){
-							// this is a variable to be replaced with a text node
-							insertTextNode(referenceElement, args[++i]);
-						}else{
-							// Need to create an element
-							tag = tag || put.defaultTag;
-							var ieInputName = ieCreateElement && args[i +1] && args[i +1].name;
-							if(ieInputName){
-								// in IE, we have to use the crazy non-standard createElement to create input's that have a name 
-								tag = '<' + tag + ' name="' + ieInputName + '">';
-							}
-							current = doc.createElement(tag);
-						}
-					}
-					if(prefix){
-						if(value == "$"){
-							value = args[++i];
-						}
-						if(prefix == "#"){
-							// #id was specified
-							current.id = value;
-						}else{
-							// we are in the className addition and removal branch
-							var currentClassName = current.className;
-							// remove the className (needed for addition or removal)
-							// see http://jsperf.com/remove-class-name-algorithm/2 for some tests on this
-							var removed = currentClassName && (" " + currentClassName + " ").replace(" " + value + " ", " ");
-							if(prefix == "."){
-								// addition, add the className
-								current.className = currentClassName ? (removed + value).substring(1) : value;
-							}else{
-								// else a '!' class removal
-								if(argument == "!"){
-									// special signal to delete this element
-									// use the ol' innerHTML trick to get IE to do some cleanup
-									put("div", current, '<').innerHTML = "";
-								}else{
-									// we already have removed the class, just need to trim
-									removed = removed.substring(1, removed.length - 1);
-									// only assign if it changed, this can save a lot of time
-									if(removed != currentClassName){
-										current.className = removed;
-									}
-								}
-							}
-							// CSS class removal
-						}
-					}
-					if(attrName){
-						if(attrValue == "$"){
-							attrValue = args[++i];
-						}
-						// [name=value]
-						if(attrName == "style"){
-							// handle the special case of setAttribute not working in old IE
-							current.style.cssText = attrValue;
-						}else{
-							current[attrName.charAt(0) == "!" ? (attrName = attrName.substring(1)) && 'removeAttribute' : 'setAttribute'](attrName, attrValue === '' ? attrName : attrValue);
-						}
-					}
-					return '';
-				});
-				if(leftoverCharacters){
-					throw new SyntaxError("Unexpected char " + leftoverCharacters + " in " + argument);
-				}
-				insertLastElement();
-				referenceElement = returnValue = current || referenceElement;
-			}
-		}
-		if(topReferenceElement && fragment){
-			// we now insert the top level elements for the fragment if it exists
-			topReferenceElement.appendChild(fragment);
-		}
-		return returnValue;
-	}
-	put.defaultTag = "div";
-	put.forDocument = forDocument;
-	return put;
-});
-})(typeof define == "undefined" ? function(deps, factory){
-	if(typeof window == "undefined"){
-		// server side JavaScript, probably (hopefully) NodeJS
-		require("./node-html")(module, factory);
-	}else{
-		// plain script in a browser
-		put = factory();
-	}
-} : define);
 
 },
 'dijit/_base/wai':function(){
@@ -4422,22 +4422,6 @@ define(["dojo/has"], function(has){
 	}
 });
 },
-'dojox/main':function(){
-define(["dojo/_base/kernel"], function(dojo) {
-	// module:
-	//		dojox/main
-
-	/*=====
-	return {
-		// summary:
-		//		The dojox package main module; dojox package is somewhat unusual in that the main module currently just provides an empty object.
-		//		Apps should require modules from the dojox packages directly, rather than loading this module.
-	};
-	=====*/
-
-	return dojo.dojox;
-});
-},
 'dojo/touch':function(){
 define(["./_base/kernel", "./_base/lang", "./aspect", "./dom", "./on", "./has", "./mouse", "./domReady", "./_base/window"],
 function(dojo, lang, aspect, dom, on, has, mouse, domReady, win){
@@ -5330,6 +5314,115 @@ define([
 
 	/*===== return exports; =====*/
 	return dijit;	// for back compat :-(
+});
+
+},
+'dojo/AdapterRegistry':function(){
+define(["./_base/kernel", "./_base/lang"], function(dojo, lang){
+// module:
+//		dojo/AdapterRegistry
+
+var AdapterRegistry = dojo.AdapterRegistry = function(/*Boolean?*/ returnWrappers){
+	// summary:
+	//		A registry to make contextual calling/searching easier.
+	// description:
+	//		Objects of this class keep list of arrays in the form [name, check,
+	//		wrap, directReturn] that are used to determine what the contextual
+	//		result of a set of checked arguments is. All check/wrap functions
+	//		in this registry should be of the same arity.
+	// example:
+	//	|	// create a new registry
+	//	|	var reg = new dojo.AdapterRegistry();
+	//	|	reg.register("handleString",
+	//	|		dojo.isString,
+	//	|		function(str){
+	//	|			// do something with the string here
+	//	|		}
+	//	|	);
+	//	|	reg.register("handleArr",
+	//	|		dojo.isArray,
+	//	|		function(arr){
+	//	|			// do something with the array here
+	//	|		}
+	//	|	);
+	//	|
+	//	|	// now we can pass reg.match() *either* an array or a string and
+	//	|	// the value we pass will get handled by the right function
+	//	|	reg.match("someValue"); // will call the first function
+	//	|	reg.match(["someValue"]); // will call the second
+
+	this.pairs = [];
+	this.returnWrappers = returnWrappers || false; // Boolean
+};
+
+lang.extend(AdapterRegistry, {
+	register: function(/*String*/ name, /*Function*/ check, /*Function*/ wrap, /*Boolean?*/ directReturn, /*Boolean?*/ override){
+		// summary:
+		//		register a check function to determine if the wrap function or
+		//		object gets selected
+		// name:
+		//		a way to identify this matcher.
+		// check:
+		//		a function that arguments are passed to from the adapter's
+		//		match() function.  The check function should return true if the
+		//		given arguments are appropriate for the wrap function.
+		// directReturn:
+		//		If directReturn is true, the value passed in for wrap will be
+		//		returned instead of being called. Alternately, the
+		//		AdapterRegistry can be set globally to "return not call" using
+		//		the returnWrappers property. Either way, this behavior allows
+		//		the registry to act as a "search" function instead of a
+		//		function interception library.
+		// override:
+		//		If override is given and true, the check function will be given
+		//		highest priority. Otherwise, it will be the lowest priority
+		//		adapter.
+		this.pairs[((override) ? "unshift" : "push")]([name, check, wrap, directReturn]);
+	},
+
+	match: function(/* ... */){
+		// summary:
+		//		Find an adapter for the given arguments. If no suitable adapter
+		//		is found, throws an exception. match() accepts any number of
+		//		arguments, all of which are passed to all matching functions
+		//		from the registered pairs.
+		for(var i = 0; i < this.pairs.length; i++){
+			var pair = this.pairs[i];
+			if(pair[1].apply(this, arguments)){
+				if((pair[3])||(this.returnWrappers)){
+					return pair[2];
+				}else{
+					return pair[2].apply(this, arguments);
+				}
+			}
+		}
+		throw new Error("No match found");
+	},
+
+	unregister: function(name){
+		// summary:
+		//		Remove a named adapter from the registry
+		// name: String
+		//		The name of the adapter.
+		// returns: Boolean
+		//		Returns true if operation is successful.
+		//		Returns false if operation fails.
+	
+		// FIXME: this is kind of a dumb way to handle this. On a large
+		// registry this will be slow-ish and we can use the name as a lookup
+		// should we choose to trade memory for speed.
+		for(var i = 0; i < this.pairs.length; i++){
+			var pair = this.pairs[i];
+			if(pair[0] == name){
+				this.pairs.splice(i, 1);
+				return true;
+			}
+		}
+		return false;
+	}
+});
+
+return AdapterRegistry;
 });
 
 },
@@ -9581,6 +9674,179 @@ define([
 
 	/*===== return exports; =====*/
 	return dijit;	// for back compat :-(
+});
+
+},
+'dojox/io/xhrPlugins':function(){
+define(["dojo/_base/kernel", "dojo/_base/xhr", "dojo/AdapterRegistry"], function(dojo, xhr, AdapterRegistry){
+	dojo.getObject("io.xhrPlugins", true, dojox);
+
+	var registry;
+	var plainXhr;
+	function getPlainXhr(){
+		return plainXhr = dojox.io.xhrPlugins.plainXhr = plainXhr || dojo._defaultXhr || xhr;
+	}
+	dojox.io.xhrPlugins.register = function(){
+		// summary:
+		//		overrides the default xhr handler to implement a registry of
+		//		xhr handlers
+		var plainXhr = getPlainXhr();
+		if(!registry){
+			registry = new AdapterRegistry();
+			// replaces the default xhr() method. Can we just use connect() instead?
+			dojo[dojo._defaultXhr ? "_defaultXhr" : "xhr"] = function(/*String*/ method, /*dojo.__XhrArgs*/ args, /*Boolean?*/ hasBody){
+				return registry.match.apply(registry,arguments);
+			};
+			registry.register(
+				"xhr",
+				function(method,args){
+					if(!args.url.match(/^\w*:\/\//)){
+						// if it is not an absolute url (or relative to the
+						// protocol) we can use this plain XHR
+						return true;
+					}
+					var root = window.location.href.match(/^.*?\/\/.*?\//)[0];
+					return args.url.substring(0, root.length) == root; // or check to see if we have the same path
+				},
+				plainXhr
+			);
+		}
+		return registry.register.apply(registry, arguments);
+	};
+	dojox.io.xhrPlugins.addProxy = function(proxyUrl){
+		// summary:
+		//		adds a server side proxy xhr handler for cross-site URLs
+		// proxyUrl:
+		//		This is URL to send the requests to.
+		// example:
+		//		Define a proxy:
+		//	|	dojox.io.xhrPlugins.addProxy("/proxy?url=");
+		//		And then when you call:
+		//	|	dojo.xhr("GET",{url:"http://othersite.com/file"});
+		//		It would result in the request (to your origin server):
+		//	|	GET /proxy?url=http%3A%2F%2Fothersite.com%2Ffile HTTP/1.1
+		var plainXhr = getPlainXhr();
+		dojox.io.xhrPlugins.register(
+			"proxy",
+			function(method,args){
+				// this will match on URL
+
+				// really can be used for anything, but plain XHR will take
+				// precedent by order of loading
+				return true;
+			},
+			function(method,args,hasBody){
+				args.url = proxyUrl + encodeURIComponent(args.url);
+				return plainXhr.call(dojo, method, args, hasBody);
+			});
+	};
+	var csXhrSupport;
+	dojox.io.xhrPlugins.addCrossSiteXhr = function(url, httpAdapter){
+		// summary:
+		//		Adds W3C Cross site XHR or XDomainRequest handling for the given URL prefix
+		//
+		// url:
+		//		Requests that start with this URL will be considered for using
+		//		cross-site XHR.
+		//
+		// httpAdapter: This allows for adapting HTTP requests that could not otherwise be
+		//		sent with XDR, so you can use a convention for headers and PUT/DELETE methods.
+		//
+		// description:
+		//		This can be used for servers that support W3C cross-site XHR. In order for
+		//		a server to allow a client to make cross-site XHR requests,
+		//		it should respond with the header like:
+		//	|	Access-Control: allow <*>
+		//		see: http://www.w3.org/TR/access-control/
+		var plainXhr = getPlainXhr();
+		if(csXhrSupport === undefined && window.XMLHttpRequest){
+			// just run this once to see if we have cross-site support
+			try{
+				var xhr = new XMLHttpRequest();
+				xhr.open("GET","http://testing-cross-domain-capability.com",true);
+				csXhrSupport = true;
+				dojo.config.noRequestedWithHeaders = true;
+			}catch(e){
+				csXhrSupport = false;
+			}
+		}
+		dojox.io.xhrPlugins.register(
+			"cs-xhr",
+			function(method,args){
+				return (csXhrSupport ||
+						(window.XDomainRequest && args.sync !== true &&
+							(method == "GET" || method == "POST" || httpAdapter))) &&
+					(args.url.substring(0,url.length) == url);
+			},
+			csXhrSupport ? plainXhr : function(){
+				var normalXhrObj = dojo._xhrObj;
+				// we will just substitute this in temporarily so we can use XDomainRequest instead of XMLHttpRequest
+				dojo._xhrObj = function(){
+					
+					var xdr = new XDomainRequest();
+					xdr.readyState = 1;
+					xdr.setRequestHeader = function(){}; // just absorb them, we can't set headers :/
+					xdr.getResponseHeader = function(header){ // this is the only header we can access
+						return header == "Content-Type" ? xdr.contentType : null;
+					}
+					// adapt the xdr handlers to xhr
+					function handler(status, readyState){
+						return function(){
+							xdr.readyState = readyState;
+							xdr.status = status;
+						}
+					}
+					xdr.onload = handler(200, 4);
+					xdr.onprogress = handler(200, 3);
+					xdr.onerror = handler(404, 4); // an error, who knows what the real status is
+					return xdr;
+				};
+				var dfd = (httpAdapter ? httpAdapter(getPlainXhr()) : getPlainXhr()).apply(dojo,arguments);
+				dojo._xhrObj = normalXhrObj;
+				return dfd;
+			}
+		);
+	};
+	dojox.io.xhrPlugins.fullHttpAdapter = function(plainXhr,noRawBody){
+		// summary:
+		//		Provides a HTTP adaption.
+		// description:
+		//		The following convention is used:
+		//		method name -> ?http-method=PUT
+		//		Header -> http-Header-Name=header-value
+		//		X-Header -> header_name=header-value
+		// example:
+		//		dojox.io.xhrPlugins.addXdr("http://somesite.com", dojox.io.xhrPlugins.fullHttpAdapter);
+		return function(method,args,hasBody){
+			var content = {};
+			var parameters = {};
+			if(method != "GET"){
+				parameters["http-method"] = method;
+				if(args.putData && noRawBody){
+					content["http-content"] = args.putData;
+					delete args.putData;
+					hasBody = false;
+				}
+				if(args.postData && noRawBody){
+					content["http-content"] = args.postData;
+					delete args.postData;
+					hasBody = false;
+				}
+				method = "POST";
+			
+			}
+			for(var i in args.headers){
+				var parameterName = i.match(/^X-/) ? i.substring(2).replace(/-/g,'_').toLowerCase() : ("http-" + i);
+				parameters[parameterName] = args.headers[i];
+			}
+			args.query = dojo.objectToQuery(parameters);
+			dojo._ioAddQueryToUrl(args);
+			args.content = dojo.mixin(args.content || {},content);
+			return plainXhr.call(dojo,method,args,hasBody);
+		};
+	};
+
+	return dojox.io.xhrPlugins;
 });
 
 },

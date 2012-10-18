@@ -30,18 +30,15 @@
         [
             "dojo/ready",
             "dojo/dom",
+            "dojo/parser",
             "dojo/on",
-            "dojox/io/xhrPlugins",
             "dojo/_base/window",
             "modulesandpipes/shell/view/components/Shell",
             "modulesandpipes/shell/ShellFacade",
             "dijit/layout/BorderContainer",
             "dijit/layout/ContentPane"
         ],
-        function(ready, dom, on, xhrPlugins, win, Shell, ShellFacade) {
-            dojox.io.xhrPlugins.addCrossSiteXhr("http://htmlpreview.github.com");
-            dojox.io.xhrPlugins.addCrossSiteXhr("https://raw.github.com");
-            dojox.io.xhrPlugins.addCrossSiteXhr("https://github.com");
+        function(ready, dom, parser, on, win, Shell, ShellFacade) {
             ready(function() {
                 var shell = new Shell({region: 'center'});
                 var facade = ShellFacade.getInstance(Shell.NAME);

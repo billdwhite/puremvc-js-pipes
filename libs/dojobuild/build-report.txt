@@ -1,4 +1,4 @@
-Build started: Thu Oct 18 2012 14:35:45 GMT-0500 (CDT)
+Build started: Thu Oct 18 2012 14:46:39 GMT-0500 (CDT)
 Build application version: 1.7.0dev (23930)
 Messages:
 info(100) Assumed module uses legacy loader API.
@@ -3861,7 +3861,6 @@ dojolayer:
 	dijit/form/_FormWidgetMixin
 	dijit/BackgroundIframe
 	dijit/form/_FormValueMixin
-	dojox/main
 	dojo/Stateful
 	dojo/touch
 	dijit/_CssStateMixin
@@ -3880,6 +3879,7 @@ dojolayer:
 	dijit/a11y
 	put-selector/put
 	dijit/typematic
+	dojox/io/xhrPlugins
 	dijit/_base/focus
 	dojolayer
 	dijit/place
@@ -3891,6 +3891,7 @@ dojolayer:
 	dijit/focus
 	dijit/_base/sniff
 	dijit/dijit
+	dojo/AdapterRegistry
 	dijit/main
 	dojo/date/stamp
 	xstyle/has-class
@@ -4249,4 +4250,4 @@ Has Features Detected
 Process finished normally
 	errors: 0
 	warnings: 30
-	build time: 61.682 seconds
+	build time: 68.715 seconds

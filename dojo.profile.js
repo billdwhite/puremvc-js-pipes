@@ -24,7 +24,7 @@ var profile = {
             include: [
                 "dojo/dojo",
                 "dijit/dijit",
-                "dojox",
+                "dojox/io/xhrPlugins",
                 "dojo/domReady", 
                 "dojo/_base/declare",
                 "dgrid/List", 
