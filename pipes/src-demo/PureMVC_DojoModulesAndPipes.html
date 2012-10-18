@@ -38,7 +38,6 @@
     require(
         [
             "dojo/ready",
-            "dojo/parser",
             "dojo/dom",
             "dojo/on",
             "dojo/_base/window",
@@ -47,7 +46,7 @@
             "dijit/layout/BorderContainer",
             "dijit/layout/ContentPane"
         ],
-        function(ready, parser, dom, on, win, Shell, ShellFacade) {
+        function(ready, dom, on, win, Shell, ShellFacade) {
             ready(function() {
                 var shell = new Shell({region: 'center'});
                 var facade = ShellFacade.getInstance(Shell.NAME);
