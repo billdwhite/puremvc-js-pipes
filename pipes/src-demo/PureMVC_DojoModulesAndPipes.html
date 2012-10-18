@@ -14,7 +14,6 @@
 
 <!-- PIPES LIBRARY -->  
 <script src="../bin/puremvc-pipes-1.0.min.js"></script>
-<script src="../../libs/dojolayer.js"></script>
 
 <script type="text/javascript"
         src="../../libs/dojobuild/dojo/dojo.js"
@@ -41,6 +40,7 @@
         ],
         function(ready, dom, on, io, win, Shell, ShellFacade) {
             dojox.io.xhrPlugins.addCrossSiteXhr("http://htmlpreview.github.com");
+            dojox.io.xhrPlugins.addCrossSiteXhr("https://raw.github.com");
             dojox.io.xhrPlugins.addCrossSiteXhr("https://github.com");
             ready(function() {
                 var shell = new Shell({region: 'center'});
